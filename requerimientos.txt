@@ -1,0 +1,32 @@
+RF001 - Registro de clientes
+El sistema deberá permitir el registro completo de nuevos clientes capturando sus datos personales, preferencias e información de contacto. El registro incluirá: información básica (nombre completo, DNI, fecha de nacimiento), datos de contacto (correo electrónico, teléfono, dirección), y preferencias específicas (tipo de juegos de interés, frecuencia esperada de visita, promociones deseadas). El sistema validará que el DNI no esté previamente registrado y enviará una confirmación automática al correo electrónico proporcionado.
+
+RF002 - Visualización de historial del cliente (Módulo de atención al cliente)
+El sistema permitirá visualizar el historial completo de cada cliente, incluyendo visitas, transacciones, participación en promociones, interacciones con servicio al cliente y preferencias históricas.
+
+RF003 - Gestión de información del cliente
+El sistema permitirá la búsqueda, edición y actualización de datos de clientes, así como el registro y seguimiento de quejas o solicitudes.
+
+RF004 - Gestión de usuarios, roles y permisos (Módulo de recursos humanos)
+El sistema permitirá la gestión completa de usuarios, roles y permisos, y permitir el registro de capacitaciones y el control de accesos según el área de trabajo.
+
+RF005 - Autenticación segura y registro de accesos (Módulo de Seguridad)
+El sistema permitirá implementar autenticación segura, registro de accesos (logs) y monitoreo de intentos de acceso no autorizados.
+
+RF006 - Administración centralizada de la infraestructura (Módulo de tecnología TI)
+El sistema permitirá la administración centralizada de la infraestructura, incluyendo monitoreo de rendimiento, panel de control para administradores de TI y gestión de recursos del sistema.
+
+RF007 - Interfaz de usuario moderna e intuitiva
+El sistema permitirá contar con un diseño accesible y sencillo, con interfaz intuitiva, navegación consistente para accesibilidad y personalización según preferencias del usuario
+
+RF008 - Acceso desde navegadores web (Accesibilidad multiplataforma)
+El sistema permitirá ser accesible desde navegadores web estándar (Chrome, Firefox, Edge, Safari) y dispositivos móviles, sin requerir instalación de software adicional. La experiencia será responsiva y se adaptará a diferentes resoluciones y tamaños de pantalla.
+
+RF009 - Gestión centralizada de operaciones
+El sistema debe integrar todos los procesos operativos en una única plataforma, eliminando tareas duplicadas y reduciendo errores mediante flujos automatizados.
+
+RF010 - Control de flujo operativo
+El sistema debe permitir el registro, seguimiento y actualización de cada proceso operativo en tiempo real, garantizando trazabilidad y eficiencia en las tareas diarias.
+
+RF011 - Protección de datos sensibles
+El sistema debe garantizar el cifrado de información confidencial y la generación de copias de seguridad automáticas para su recuperación.

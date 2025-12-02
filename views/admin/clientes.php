@@ -1,13 +1,20 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_usuario'] != 'empleado') {
-    header("Location: login.php");
+    header("Location: ../public/login.php");
     exit();
 }
-require_once '../config/conexion.php';
+require_once '../../config/conexion.php';
 $conn = Conexion::conectar();
-$stmt = $conn->query("SELECT * FROM Clientes");
+
+// Obtener clientes con nombre de segmento
+$sql = "SELECT c.*, s.nombre as segmento_nombre FROM Clientes c LEFT JOIN Segmentos s ON c.segmento_id = s.segmento_id";
+$stmt = $conn->query($sql);
 $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Obtener segmentos para el modal
+$stmtSeg = $conn->query("SELECT * FROM Segmentos");
+$segmentos = $stmtSeg->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -32,41 +39,33 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .main-content { margin-left: 250px; padding: 20px; }
         .btn-gold { background: linear-gradient(135deg, #d4af37 0%, #b48f26 100%); border: none; color: #000; font-weight: 600; }
         .btn-gold:hover { background: linear-gradient(135deg, #f2d06b 0%, #d4af37 100%); }
+        .card-header-gold { background: linear-gradient(135deg, #d4af37 0%, #b48f26 100%); color: #000; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Atlantic City</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="admin_dashboard.php"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-            <li><a href="clientes.php" class="active"><i class="fas fa-users"></i> Gestión de Clientes</a></li>
-            <li><a href="#"><i class="fas fa-ticket-alt"></i> Promociones</a></li>
-            <li><a href="#"><i class="fas fa-exclamation-triangle"></i> Incidencias</a></li>
-            <li><a href="#"><i class="fas fa-gamepad"></i> Análisis de Juegos</a></li>
-            <li style="margin-top: 50px;"><a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-        </ul>
-    </div>
+    <?php include '../../includes/sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Gestión de Clientes</h2>
-            <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#clienteModal" onclick="resetForm()">
-                <i class="fas fa-plus"></i> Nuevo Cliente
-            </button>
-        </div>
+        <div class="container-fluid">
+            <h2 class="mb-4 fw-bold text-dark">Gestión de Clientes</h2>
 
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body">
-                <table id="tablaClientes" class="table table-hover">
-                    <thead>
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header card-header-gold rounded-top-4 d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-users me-2"></i> Listado de Clientes</span>
+                    <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#clienteModal" onclick="resetForm()">
+                        <i class="fas fa-plus"></i> Nuevo Cliente
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="tablaClientes" class="table table-hover align-middle">
+                            <thead class="table-light">
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
+                            <th>DNI</th>
                             <th>Correo</th>
                             <th>Teléfono</th>
                             <th>Segmento</th>
@@ -78,14 +77,14 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <td><?php echo $c['cliente_id']; ?></td>
                             <td><?php echo htmlspecialchars($c['nombre']); ?></td>
+                            <td><?php echo htmlspecialchars($c['dni'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($c['correo']); ?></td>
                             <td><?php echo htmlspecialchars($c['telefono']); ?></td>
                             <td>
-                                <span class="badge <?php echo $c['segmento'] == 'VIP' ? 'bg-warning text-dark' : 'bg-secondary'; ?>">
-                                    <?php echo htmlspecialchars($c['segmento']); ?>
-                                </span>
+                                <span class="badge bg-primary"><?php echo htmlspecialchars($c['segmento_nombre'] ?? 'Sin Asignar'); ?></span>
                             </td>
                             <td>
+                                <a href="perfil_cliente.php?id=<?php echo $c['cliente_id']; ?>" class="btn btn-sm btn-info text-white" title="Ver Perfil"><i class="fas fa-eye"></i></a>
                                 <button class="btn btn-sm btn-warning" onclick="editarCliente(<?php echo $c['cliente_id']; ?>)"><i class="fas fa-edit"></i></button>
                                 <button class="btn btn-sm btn-danger" onclick="eliminarCliente(<?php echo $c['cliente_id']; ?>)"><i class="fas fa-trash"></i></button>
                             </td>
@@ -93,17 +92,19 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                    </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal -->
     <div class="modal fade" id="clienteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-dark text-white">
                     <h5 class="modal-title" id="modalTitle">Nuevo Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="clienteForm">
@@ -112,7 +113,20 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         
                         <div class="mb-3">
                             <label class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" title="Solo letras y espacios">
+                            <div class="invalid-feedback">Nombre inválido (solo letras).</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">DNI</label>
+                                <input type="text" class="form-control" id="dni" name="dni" required maxlength="8" pattern="\d{8}">
+                                <div class="invalid-feedback" id="dniFeedback">DNI debe tener 8 dígitos.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha Nacimiento</label>
+                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                <div class="invalid-feedback">Debe ser mayor de 18 años.</div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Dirección</label>
@@ -121,10 +135,12 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="mb-3">
                             <label class="form-label">Correo Electrónico</label>
                             <input type="email" class="form-control" id="correo" name="correo" required>
+                            <div class="invalid-feedback">Correo inválido.</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" class="form-control" id="telefono" name="telefono">
+                            <input type="text" class="form-control" id="telefono" name="telefono" maxlength="9" pattern="\d{9}">
+                            <div class="invalid-feedback">Teléfono debe tener 9 dígitos.</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Preferencias</label>
@@ -132,10 +148,10 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Segmento</label>
-                            <select class="form-select" id="segmento" name="segmento">
-                                <option value="Regular">Regular</option>
-                                <option value="VIP">VIP</option>
-                                <option value="Nuevo">Nuevo</option>
+                            <select class="form-select" id="segmento_id" name="segmento_id" required>
+                                <?php foreach($segmentos as $seg): ?>
+                                    <option value="<?php echo $seg['segmento_id']; ?>"><?php echo htmlspecialchars($seg['nombre']); ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                     </form>
@@ -153,6 +169,6 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../assets/js/clientes.js"></script>
+    <script src="../../assets/js/clientes.js"></script>
 </body>
 </html>

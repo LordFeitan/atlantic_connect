@@ -3,7 +3,7 @@ require_once 'config/conexion.php';
 
 try {
     $conn = Conexion::conectar();
-    $tables = ['Visitas', 'Incidencias', 'Promociones'];
+    $tables = ['visitas', 'incidencias', 'promociones'];
 
     foreach ($tables as $table) {
         echo "Table: $table\n";

@@ -18,13 +18,13 @@ try {
     // Inspect Clientes
     if (in_array('Clientes', $tables) || in_array('clientes', $tables)) {
         echo "<h2>Estructura de 'Clientes':</h2>";
-        $stmt = $conn->query("DESCRIBE Clientes");
+        $stmt = $conn->query("DESCRIBE clientes");
         echo "<pre>";
         print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
         echo "</pre>";
 
         echo "<h2>Datos en 'Clientes' (Primeros 5):</h2>";
-        $stmt = $conn->query("SELECT * FROM Clientes LIMIT 5");
+        $stmt = $conn->query("SELECT * FROM clientes LIMIT 5");
         echo "<pre>";
         print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
         echo "</pre>";
@@ -35,13 +35,13 @@ try {
     // Inspect Empleados
     if (in_array('Empleados', $tables) || in_array('empleados', $tables)) {
         echo "<h2>Estructura de 'Empleados':</h2>";
-        $stmt = $conn->query("DESCRIBE Empleados");
+        $stmt = $conn->query("DESCRIBE empleados");
         echo "<pre>";
         print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
         echo "</pre>";
 
         echo "<h2>Datos en 'Empleados' (Primeros 5):</h2>";
-        $stmt = $conn->query("SELECT * FROM Empleados LIMIT 5");
+        $stmt = $conn->query("SELECT * FROM empleados LIMIT 5");
         echo "<pre>";
         print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
         echo "</pre>";
