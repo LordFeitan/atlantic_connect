@@ -68,9 +68,50 @@ try {
         $stmt->execute([$id]);
         $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
         echo json_encode($cliente);
+    } elseif ($action == 'get_profile') {
+        $id = $_POST['id'];
+        
+        // 1. Client Info
+        $stmt = $conn->prepare("SELECT c.*, s.nombre as segmento_nombre FROM clientes c LEFT JOIN segmentos s ON c.segmento_id = s.segmento_id WHERE c.cliente_id = ?");
+        $stmt->execute([$id]);
+        $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$cliente) {
+            echo json_encode(['success' => false, 'message' => 'Cliente no encontrado']);
+            exit;
+        }
+
+        // 2. Visits
+        $stmt = $conn->prepare("SELECT * FROM visitas WHERE cliente_id = ? ORDER BY fecha_hora DESC");
+        $stmt->execute([$id]);
+        $visitas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 3. Promotions
+        $stmt = $conn->prepare("SELECT cp.*, p.nombre, p.descripcion FROM cliente_promociones cp JOIN promociones p ON cp.promocion_id = p.promocion_id WHERE cp.cliente_id = ? ORDER BY cp.fecha_asignacion DESC");
+        $stmt->execute([$id]);
+        $promociones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 4. Incidents
+        $stmt = $conn->prepare("SELECT i.*, t.nombre as tipo FROM incidencias i JOIN tipo_incidencia t ON i.tipo_incidencia_id = t.tipo_incidencia_id WHERE i.cliente_id = ? ORDER BY i.fecha_registro DESC");
+        $stmt->execute([$id]);
+        $incidencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 5. Gaming Sessions
+        $stmt = $conn->prepare("SELECT sj.*, j.nombre as juego, j.tipo FROM sesiones_juego sj JOIN juegos j ON sj.juego_id = j.juego_id WHERE sj.cliente_id = ? ORDER BY sj.fecha_jugada DESC");
+        $stmt->execute([$id]);
+        $juegos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'success' => true,
+            'cliente' => $cliente,
+            'visitas' => $visitas,
+            'promociones' => $promociones,
+            'incidencias' => $incidencias,
+            'juegos' => $juegos
+        ]);
     } elseif ($action == 'list') {
         // Join with Segmentos to get segment name
-        $sql = "SELECT c.*, s.nombre as segmento_nombre FROM Clientes c LEFT JOIN Segmentos s ON c.segmento_id = s.segmento_id";
+        $sql = "SELECT c.*, s.nombre as segmento_nombre FROM clientes c LEFT JOIN segmentos s ON c.segmento_id = s.segmento_id";
         $stmt = $conn->query($sql);
         $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['data' => $clientes]);

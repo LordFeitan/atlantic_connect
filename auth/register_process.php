@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         // Obtener ID del segmento 'Nuevo'
-        $stmtSeg = $conn->prepare("SELECT segmento_id FROM Segmentos WHERE nombre = 'Nuevo'");
+        $stmtSeg = $conn->prepare("SELECT segmento_id FROM segmentos WHERE nombre = 'Nuevo'");
         $stmtSeg->execute();
         $segmento_id = $stmtSeg->fetchColumn();
         if (!$segmento_id) $segmento_id = 1; // Fallback

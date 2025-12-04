@@ -30,8 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['tipo_usuario'] = $tipo_usuario;
 
             if ($tipo_usuario == 'cliente') {
-                // header("Location: ../views/public/client_portal.php");
-                echo "Bienvenido Cliente";
+                header("Location: ../views/client_portal.php");
+                // echo "Bienvenido Cliente";
             } else {
                 header("Location: ../views/admin/admin_dashboard.php");
             }

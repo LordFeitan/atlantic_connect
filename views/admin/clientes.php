@@ -8,12 +8,12 @@ require_once '../../config/conexion.php';
 $conn = Conexion::conectar();
 
 // Obtener clientes con nombre de segmento
-$sql = "SELECT c.*, s.nombre as segmento_nombre FROM Clientes c LEFT JOIN Segmentos s ON c.segmento_id = s.segmento_id";
+$sql = "SELECT c.*, s.nombre as segmento_nombre FROM clientes c LEFT JOIN segmentos s ON c.segmento_id = s.segmento_id";
 $stmt = $conn->query($sql);
 $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Obtener segmentos para el modal
-$stmtSeg = $conn->query("SELECT * FROM Segmentos");
+$stmtSeg = $conn->query("SELECT * FROM segmentos");
 $segmentos = $stmtSeg->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
